@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'events',
     'groups',
     'friends',
+    'story',
 ]
 
 MIDDLEWARE = [
@@ -95,6 +96,7 @@ DATABASES = {
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
+
 
 
 

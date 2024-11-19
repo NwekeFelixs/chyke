@@ -12,4 +12,5 @@ urlpatterns = [
     path('api/groups/', include('groups.urls')),
     path('api/', include('post.urls')),
     path('api/friends/', include('friends.urls')),
+    path('api/story/', include('story.urls')),
 ]

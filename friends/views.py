@@ -1,9 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from .models import Friendship
 from .serializers import FriendshipSerializer
 from django.contrib.auth import get_user_model
+from story.serializers import StorySerializer
+from story.models import Story
 
 User = get_user_model()
 
@@ -42,3 +45,27 @@ class RejectFriendRequestView(APIView):
             return Response({"detail": "Friend request rejected."}, status=status.HTTP_200_OK)
         except Friendship.DoesNotExist:
             return Response({"detail": "Friend request not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+class FriendStoriesView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        
+        # Retrieve friends with accepted status
+        friendships = Friendship.objects.filter(
+            (models.Q(sender=user) | models.Q(receiver=user)),
+            status="accepted"
+        )
+
+        # Get the users who are friends
+        friend_ids = [friendship.receiver.id if friendship.sender == user else friendship.sender.id for friendship in friendships]
+
+        # Retrieve the most recent stories for those friends (limit to 5)
+        recent_stories = Story.objects.filter(user__id__in=friend_ids).order_by('-created_at')[:5]
+
+        # Serialize the stories
+        serializer = StorySerializer(recent_stories, many=True)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
