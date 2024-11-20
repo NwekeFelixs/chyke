@@ -4,11 +4,13 @@ from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
 SECRET_KEY = "django-insecure-8fuoq#=77o(xch1_cz+**8k-x(-%$e=e0q@xlks$^e+%ngv7^f"
 
 DEBUG = True
+
+if DEBUG:
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 ALLOWED_HOSTS = []
 
@@ -55,12 +57,12 @@ DJOSER = {
     'LOGIN_FIELD': 'email',
 }
 
+
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=50),  # Adjust token lifetime as needed
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=2),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
-    'UPDATE_LAST_LOGIN': True,
 }
 
 ROOT_URLCONF = "chyke.urls"
@@ -126,10 +128,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DATETIME_FORMAT': '%Y-%m-%d %H:%M:',  
 }
 
 # settings.py (add this)
-MEDIA_URL = '/media/'
+MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 

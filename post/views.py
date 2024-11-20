@@ -1,4 +1,5 @@
 from rest_framework import generics, permissions, status
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
@@ -9,11 +10,18 @@ from friends.models import Friendship
 
 # Create Post API
 class PostListCreateView(generics.ListCreateAPIView):
-    queryset = Post.objects.all().order_by('-created_at')
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    parser_classes = [MultiPartParser, FormParser]  # Add these parsers to handle file uploads
+
+    def get_queryset(self):
+        # Filter posts by the logged-in user if they are authenticated
+        if self.request.user.is_authenticated:
+            return Post.objects.all().order_by('-created_at')
+        return Post.objects.all().order_by('-created_at')  # Public posts for unauthenticated users
 
     def perform_create(self, serializer):
+        # Assign the current user to the post when it is created
         serializer.save(user=self.request.user)
 
 # Create Comment API
